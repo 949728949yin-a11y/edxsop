@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDS元素匹配工具SOP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a6dbb 0%, #0d4d8a 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 50px;
+            color: #4fc3f7;
+        }
+        
+        .logo-text h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .logo-text p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .quick-info {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            max-width: 300px;
+        }
+        
+        .quick-info h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .quick-info ul {
+            list-style-type: none;
+        }
+        
+        .quick-info li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 18px 10px;
+            cursor: pointer;
+            border-right: 1px solid #eee;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .tab:last-child {
+            border-right: none;
+        }
+        
+        .tab:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .tab.active {
+            background-color: #1a6dbb;
+            color: white;
+        }
+        
+        .content-section {
+            display: none;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        .section-icon {
+            font-size: 28px;
+            color: #1a6dbb;
+            width: 60px;
+            height: 60px;
+            background-color: #e8f4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .section-title h2 {
+            font-size: 28px;
+            color: #1a6dbb;
+        }
+        
+        .section-subtitle {
+            color: #666;
+            font-size: 18px;
+        }
+        
+        .highlight-box {
+            background-color: #f0f7ff;
+            border-left: 4px solid #1a6dbb;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .highlight-box.warning {
+            background-color: #fff8e1;
+            border-left-color: #ffc107;
+        }
+        
+        .highlight-box.success {
+            background-color: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        th {
+            background-color: #1a6dbb;
+            color: white;
+            font-weight: 600;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .color-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .color-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            min-width: 200px;
+        }
+        
+        .code-block {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .algorithm-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .algorithm-step {
+            background-color: white;
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .algorithm-step:before {
+            content: "";
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #eaeaea;
+        }
+        
+        .algorithm-step:first-child:before {
+            display: none;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background-color: #1a6dbb;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .step-content h4 {
+            display: inline-block;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .section-title {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-atom"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>EDS元素匹配分析工具</h1>
+                        <p>标准操作程序 (SOP) v2.0</p>
+                    </div>
+                </div>
+                <div class="quick-info">
+                    <h3><i class="fas fa-info-circle"></i> 工具概览</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> 元素组成相似度匹配</li>
+                        <li><i class="fas fa-sort-amount-down"></i> 智能两级排序算法</li>
+                        <li><i class="fas fa-file-excel"></i> Excel VBA宏工具</li>
+                        <li><i class="fas fa-chart-bar"></i> 可视化结果报告</li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        
+        <div class="nav-tabs">
+            <div class="tab active" data-target="overview">工具概览</div>
+            <div class="tab" data-target="database">数据库格式</div>
+            <div class="tab" data-target="input">输入格式</div>
+            <div class="tab" data-target="algorithm">匹配算法</div>
+            <div class="tab" data-target="operation">操作步骤</div>
+            <div class="tab" data-target="results">结果解读</div>
+            <div class="tab" data-target="troubleshoot">故障排除</div>
+        </div>
+        
+        <!-- 工具概览部分 -->
+        <section id="overview" class="content-section active">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <h2>工具概览</h2>
+                    <p class="section-subtitle">了解EDS元素匹配工具的核心功能与设计理念</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3><i class="fas fa-bullseye"></i> 工具目的</h3>
+                <p>本工具用于在EDS(能谱分析)元素数据库中，快速查找与新测试样品元素组成最相似的已知样品。它通过智能匹配算法，对数据库中的样品按相似度进行排序，辅助材料鉴定、成分比对和数据分析。</p>
+            </div>
+            
+            <h3><i class="fas fa-star"></i> 核心功能</h3>
+            <table>
+                <tr>
+                    <th width="30%">功能</th>
+                    <th>描述</th>
+                </tr>
+                <tr>
+                    <td>组成匹配</td>
+                    <td>根据元素种类及含量百分比进行相似度计算</td>
+                </tr>
+                <tr>
+                    <td>两级排序</td>
+                    <td>优先匹配共有元素数量，其次匹配元素含量相似度</td>
+                </tr>
+                <tr>
+                    <td>结果可视化</td>
+                    <td>自动生成带颜色编码的排序报告和详细对比报告</td>
+                </tr>
+                <tr>
+                    <td>批量处理</td>
+                    <td>一次性比对数据库中的所有样品，快速高效</td>
+                </tr>
+            </table>
+            
+            <h3><i class="fas fa-check-circle"></i> 适用范围</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>材料科学、地质学、冶金等领域中的EDS、XRF、ICP等元素组成数据</li>
+                <li>数据库结构为：样品编号、样品名称、多种元素含量（百分比）</li>
+                <li>需要快速比对未知样品与已知样品组成的场景</li>
+            </ul>
+        </section>
+        
+        <!-- 数据库格式部分 -->
+        <section id="database" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h2>数据库格式要求</h2>
+                    <p class="section-subtitle">确保您的Excel数据库符合规范格式</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> 重要提示</h3>
+                <p>数据库格式必须严格按照以下要求，否则工具可能无法正常运行或产生错误结果。</p>
+            </div>
+            
+            <h3><i class="fas fa-table"></i> 必需的Excel工作表结构</h3>
+            <table>
+                <tr>
+                    <th width="20%">列顺序</th>
+                    <th width="25%">列标题示例</th>
+                    <th>数据类型</th>
+                    <th>要求与说明</th>
+                </tr>
+                <tr>
+                    <td><strong>A列 (第1列)</strong></td>
+                    <td>编号、ID、SampleID</td>
+                    <td>文本/数字</td>
+                    <td><strong>必需。</strong>每个样品的唯一标识符</td>
+                </tr>
+                <tr>
+                    <td><strong>B列 (第2列)</strong></td>
+                    <td>名称、样品名、SampleName</td>
+                    <td>文本</td>
+                    <td><strong>必需。</strong>样品的描述性名称</td>
+                </tr>
+                <tr>
+                    <td><strong>C列及以后</strong></td>
+                    <td>Fe、O、C、Si、Al...</td>
+                    <td>数字</td>
+                    <td><strong>必需。</strong>元素含量，以<strong>百分比(%)</strong>为单位。空单元格或<code>0</code>表示该元素未检出或不存在</td>
+                </tr>
+            </table>
+            
+            <h3><i class="fas fa-list-check"></i> 格式要求</h3>
+            <ul style="margin-left: 20px; margin-top: 10px; margin-bottom: 20px;">
+                <li><strong>表头</strong>：必须位于工作表的第一行，且无合并单元格</li>
+                <li><strong>数据区域</strong>：表头下方为连续的数据行，中间无空行</li>
+                <li><strong>元素名称</strong>：建议使用标准化学符号（如<code>Fe</code>，而非<code>铁</code>），并与后续输入的查询元素保持<strong>大小写一致</strong></li>
+            </ul>
+            
+            <h3><i class="fas fa-eye"></i> 数据示例</h3>
+            <div class="code-block">
+编号,名称,Fe,O,C,Si,Mg<br>
+S001,低碳钢,98.5,0.3,0.2,0.5,0.05<br>
+S002,不锈钢,72.0,1.5,0.1,0.8,0.0<br>
+S003,铝合金,0.5,0.0,0.0,8.5,90.0
+            </div>
+        </section>
+        
+        <!-- 输入格式部分 -->
+        <section id="input" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-keyboard"></i>
+                </div>
+                <div>
+                    <h2>输入格式规范</h2>
+                    <p class="section-subtitle">正确输入新物质的元素组成信息</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box success">
+                <h3><i class="fas fa-check"></i> 基本语法</h3>
+                <div class="code-block" style="background-color: #e8f5e9; color: #333;">
+元素1:含量1, 元素2:含量2, 元素3:含量3, ...
+                </div>
+                <p><strong>分隔符</strong>：元素对之间使用<strong>英文逗号</strong> <code>,</code> 分隔</p>
+                <p><strong>连接符</strong>：元素名与含量之间使用<strong>英文冒号</strong> <code>:</code> 连接</p>
+                <p><strong>空格</strong>：可加可不加，工具会自动处理</p>
+            </div>
+            
+            <h3><i class="fas fa-thumbs-up"></i> 正确示例</h3>
+            <div class="color-legend">
+                <div class="color-item" style="background-color: #e8f5e9;">
+                    <div class="code-block" style="margin:0; padding:10px; font-size:14px;">Fe:68.5, C:12.3, Si:8.7</div>
+                </div>
+                <div class="color-item" style="background-color: #e8f5e9;">
+                    <div class="code-block" style="margin:0; padding:10px; font-size:14px;">Al:85.3, Mg:8.7, Cu:3.2, Si:2.8</div>
+                </div>
+                <div class="color-item" style="background-color: #e8f5e9;">
+                    <div class="code-block" style="margin:0; padding:10px; font-size:14px;">O:45.6, Si:32.1, Al:12.3</div>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-thumbs-down"></i> 错误示例</h3>
+            <table>
+                <tr>
+                    <th width="30%">错误输入</th>
+                    <th width="30%">问题</th>
+                    <th>正确写法</th>
+                </tr>
+                <tr>
+                    <td><code>Fe O C</code></td>
+                    <td>缺少逗号分隔</td>
+                    <td><code>Fe,O,C</code></td>
+                </tr>
+                <tr>
+                    <td><code>Fe：68.5</code></td>
+                    <td>使用了中文冒号</td>
+                    <td><code>Fe:68.5</code></td>
+                </tr>
+                <tr>
+                    <td><code>Fe,68.5</code></td>
+                    <td>缺少冒号连接</td>
+                    <td><code>Fe:68.5</code></td>
+                </tr>
+                <tr>
+                    <td><code>Fe:68.5 C:12.3</code></td>
+                    <td>缺少逗号分隔</td>
+                    <td><code>Fe:68.5, C:12.3</code></td>
+                </tr>
+            </table>
+        </section>
+        
+        <!-- 匹配算法部分 -->
+        <section id="algorithm" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div>
+                    <h2>匹配算法原理</h2>
+                    <p class="section-subtitle">理解工具如何计算和排序相似度</p>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h3><i class="fas fa-sitemap"></i> 两级排序逻辑</h3>
+                <p>工具的匹配逻辑分为两个层级，确保先找到"成分最接近"的样品，再区分其中"含量最相似"的样品。</p>
+            </div>
+            
+            <div class="algorithm-visual">
+                <div class="algorithm-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>第一层级：共有元素数量（决定性因素）</h4>
+                        <p><strong>权重：70%</strong></p>
+                        <p>首先计算新物质与数据库样品之间<strong>共同具有的元素种类数量</strong>。例如，新物质含[Fe, C, Si]，某样品含[Fe, O, C, Mg]，则共有元素为[Fe, C]，数量为2。</p>
+                        <p><strong>目的</strong>：优先筛选出化学成分大类最接近的样品。</p>
+                    </div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>第二层级：元素含量相似度（精细调整）</h4>
+                        <p><strong>权重：30%</strong></p>
+                        <p>针对共同具有的每一个元素，计算其含量百分比的相似程度。</p>
+                        <p><strong>单个元素相似度计算公式</strong>：</p>
+                        <div class="code-block">
+元素相似度 = 1 - ( |新物质含量 - 样品含量| ) / Max(新物质含量, 样品含量)
+                        </div>
+                        <p>结果越接近1，表示该元素含量越相似。</p>
+                        <p><strong>平均含量相似度</strong>：对所有共有元素的相似度取平均值。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-formula"></i> 综合得分计算公式</h3>
+            <div class="code-block">
+最终相似度得分 = (共有元素数 / 新物质总元素数) × 70 + 平均含量相似度 × 30
+            </div>
+            <p><strong>得分范围</strong>：0 - 100 分，分数越高代表整体组成越相似。</p>
+            
+            <h3><i class="fas fa-sort"></i> 排序规则</h3>
+            <ol style="margin-left: 20px; margin-top: 10px; font-size: 18px;">
+                <li><strong>首要规则</strong>：按<strong>共有元素数量</strong>从多到少降序排列</li>
+                <li><strong>次要规则</strong>：当共有元素数量相同时，按<strong>最终相似度得分</strong>从高到低降序排列</li>
+            </ol>
+        </section>
+        
+        <!-- 操作步骤部分 -->
+        <section id="operation" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-list-ol"></i>
+                </div>
+                <div>
+                    <h2>操作步骤指南</h2>
+                    <p class="section-subtitle">从准备到运行工具的完整流程</p>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-tools"></i> 前期准备</h3>
+            <div class="algorithm-visual">
+                <div class="algorithm-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>打开Excel数据库文件</h4>
+                        <p>确保您的EDS数据库文件已按照"数据库格式"要求整理好。</p>
+                    </div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>打开VBA编辑器</h4>
+                        <p>按下 <code>Alt + F11</code> 键，打开VBA编辑器。</p>
+                    </div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>插入模块并粘贴代码</h4>
+                        <p>在左侧"项目资源管理器"中，右键点击您的Excel文件名，选择<strong>"插入" → "模块"</strong>。将完整VBA代码粘贴到新模块中。</p>
+                    </div>
+                </div>
+                
+                <div class="algorithm-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>保存并关闭</h4>
+                        <p>按下 <code>Ctrl + S</code> 保存，然后关闭VBA编辑器。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-play-circle"></i> 运行匹配工具</h3>
+            <table>
+                <tr>
+                    <th width="30%">运行方式</th>
+                    <th>步骤</th>
+                    <th width="30%">适用场景</th>
+                </tr>
+                <tr>
+                    <td><strong>通过VBA编辑器运行</strong></td>
+                    <td>
+                        <ol style="margin-left: 20px;">
+                            <li>在Excel中，按下 <code>Alt + F11</code></li>
+                            <li>在VBA编辑器内，将光标置于 <code>Run_EDS_CompositionMatch</code> 子程序内部</li>
+                            <li>按下 <code>F5</code> 键或点击工具栏上的"运行"按钮</li>
+                        </ol>
+                    </td>
+                    <td>推荐用于测试和开发</td>
+                </tr>
+                <tr>
+                    <td><strong>通过Excel按钮运行</strong></td>
+                    <td>
+                        <ol style="margin-left: 20px;">
+                            <li>在Excel功能区，启用"开发工具"选项卡</li>
+                            <li>点击"开发工具"→"插入"→"按钮（窗体控件）"</li>
+                            <li>在工作表空白处绘制一个按钮</li>
+                            <li>在弹出的"指定宏"对话框中，选择 <code>Run_EDS_CompositionMatch</code></li>
+                            <li>点击此按钮即可运行工具</li>
+                        </ol>
+                    </td>
+                    <td>便于日常使用和分享</td>
+                </tr>
+            </table>
+            
+            <h3><i class="fas fa-cogs"></i> 执行匹配流程</h3>
+            <div class="highlight-box">
+                <ol style="margin-left: 20px;">
+                    <li>运行后，弹出<strong>输入框</strong>，请按输入格式规范输入新物质组成（如 <code>Fe:68.5, C:12.3</code>）</li>
+                    <li>点击"确定"，工具将开始计算并显示处理进度</li>
+                    <li>计算完成后，会自动生成 <strong>"EDS匹配结果"</strong> 工作表</li>
+                    <li>系统询问是否生成详细报告时，可根据需要选择"是"或"否"</li>
+                </ol>
+            </div>
+        </section>
+        
+        <!-- 结果解读部分 -->
+        <section id="results" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div>
+                    <h2>结果解读与报告</h2>
+                    <p class="section-subtitle">理解工具生成的匹配结果</p>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-file-excel"></i> 主报告 (<code>EDS匹配结果</code> 工作表)</h3>
+            <p>报告包含以下列，按相似度从高到低排序：</p>
+            <table>
+                <tr>
+                    <th width="20%">列名</th>
+                    <th>内容说明</th>
+                    <th width="30%">示例</th>
+                </tr>
+                <tr>
+                    <td><strong>排名</strong></td>
+                    <td>综合相似度排序序号</td>
+                    <td><code>1</code>, <code>2</code>, <code>3</code></td>
+                </tr>
+                <tr>
+                    <td><strong>样品名称</strong></td>
+                    <td>数据库中样品的名称</td>
+                    <td><code>低碳钢</code>, <code>铝合金</code></td>
+                </tr>
+                <tr>
+                    <td><strong>相似度%</strong></td>
+                    <td>综合得分（0-100），颜色从绿（高）到红（低）</td>
+                    <td><code>92.5</code>, <code>76.1</code></td>
+                </tr>
+                <tr>
+                    <td><strong>共有元素数</strong></td>
+                    <td><strong>纯数字</strong>，表示匹配到的元素种类数量</td>
+                    <td><code>3</code>, <code>2</code></td>
+                </tr>
+                <tr>
+                    <td><strong>匹配比例</strong></td>
+                    <td>以"共有元素数/新物质总元素数"格式显示</td>
+                    <td><code>3/5</code>, <code>2/3</code></td>
+                </tr>
+                <tr>
+                    <td><strong>匹配详情</strong></td>
+                    <td>列出每个匹配元素的含量对比及元素相似度</td>
+                    <td><code>Fe:新68.5%/样65.2%(相似95%); C:新12.3%/样... </code></td>
+                </tr>
+            </table>
+            
+            <h3><i class="fas fa-palette"></i> 颜色标识系统</h3>
+            <div class="color-legend">
+                <div class="color-item">
+                    <div class="color-indicator" style="background-color: #00b050;"></div>
+                    <div>
+                        <strong>深绿</strong>
+                        <div>全部元素匹配</div>
+                    </div>
+                </div>
+                <div class="color-item">
+                    <div class="color-indicator" style="background-color: #92d050;"></div>
+                    <div>
+                        <strong>浅绿</strong>
+                        <div>匹配≥70%元素</div>
+                    </div>
+                </div>
+                <div class="color-item">
+                    <div class="color-indicator" style="background-color: #ffff00;"></div>
+                    <div>
+                        <strong>黄色</strong>
+                        <div>匹配≥50%元素</div>
+                    </div>
+                </div>
+                <div class="color-item">
+                    <div class="color-indicator" style="background-color: #ffc000;"></div>
+                    <div>
+                        <strong>橙色</strong>
+                        <div>匹配≥30%元素</div>
+                    </div>
+                </div>
+                <div class="color-item">
+                    <div class="color-indicator" style="background-color: #ff0000;"></div>
+                    <div>
+                        <strong>红色</strong>
+                        <div>匹配较少元素</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3><i class="fas fa-search"></i> 详细报告 (<code>前10名详细数据</code> 工作表)</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>展示排名前10的样品</li>
+                <li>额外列出新物质的所有元素及其含量，便于横向对比</li>
+                <li>包含匹配元素列表，清晰展示哪些元素被匹配到</li>
+            </ul>
+        </section>
+        
+        <!-- 故障排除部分 -->
+        <section id="troubleshoot" class="content-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-wrench"></i>
+                </div>
+                <div>
+                    <h2>故障排除</h2>
+                    <p class="section-subtitle">常见问题与解决方案</p>
+                </div>
+            </div>
+            
+            <table>
+                <tr>
+                    <th width="30%">问题现象</th>
+                    <th width="35%">可能原因</th>
+                    <th>解决方案</th>
+                </tr>
+                <tr>
+                    <td>"编译错误"</td>
+                    <td>VBA代码粘贴不完整或格式错误</td>
+                    <td>1. 检查是否粘贴了所有代码<br>2. 确保<code>Option Explicit</code>在模块顶部</td>
+                </tr>
+                <tr>
+                    <td>运行时错误"424"或"对象错误"</td>
+                    <td>数据库工作表格式不符</td>
+                    <td>检查数据表是否符合格式要求，特别是A、B列是否为编号和名称</td>
+                </tr>
+                <tr>
+                    <td>提示"未找到匹配的元素列"</td>
+                    <td>1. 输入的元素名与数据库表头不一致<br>2. 数据库元素列不是从第3列开始</td>
+                    <td>1. 核对输入元素名与表头（如<code>Fe</code> vs <code>铁</code>）<br>2. 确认数据从C列开始</td>
+                </tr>
+                <tr>
+                    <td>匹配结果异常或为空</td>
+                    <td>1. 数据库中样品含量为0或空<br>2. 新物质元素含量输入格式错误</td>
+                    <td>1. 检查数据库中相关元素的单元格是否有有效数值<br>2. 严格按照<code>元素:含量</code>格式输入</td>
+                </tr>
+                <tr>
+                    <td>"匹配比例"列显示为日期</td>
+                    <td>Excel将<code>3/5</code>自动识别为日期格式</td>
+                    <td>已修复。工具已强制将该列设置为文本格式</td>
+                </tr>
+                <tr>
+                    <td>运行缓慢或Excel无响应</td>
+                    <td>数据库行数过多（超过10000行）</td>
+                    <td>1. 分批处理数据<br>2. 优化数据库，移除不必要的数据</td>
+                </tr>
+            </table>
+            
+            <div class="highlight-box warning" style="margin-top: 30px;">
+                <h3><i class="fas fa-lightbulb"></i> 使用建议</h3>
+                <ul style="margin-left: 20px;">
+                    <li><strong>首次测试</strong>：使用简单数据验证工具正常运行</li>
+                    <li><strong>元素名称</strong>：与数据库表头保持完全一致</li>
+                    <li><strong>批量分析</strong>：可依次输入不同组成进行系列分析</li>
+                    <li><strong>结果筛选</strong>：可在结果表中使用Excel筛选功能</li>
+                    <li><strong>数据备份</strong>：定期备份原始数据库</li>
+                </ul>
+            </div>
+        </section>
+        
+        <footer>
+            <p>EDS元素组成相似度匹配工具 SOP v2.0 | 最后更新: 2023年10月</p>
+            <p>© 2023 材料分析工具集 | 此工具为辅助分析工具，匹配结果需结合专业知识和实际样品情况进行最终判断</p>
+        </footer>
+    </div>
+
+    <script>
+        // 标签页切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.content-section');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // 移除所有标签的active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // 添加当前标签的active类
+                    this.classList.add('active');
+                    
+                    // 隐藏所有内容区域
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    // 显示目标内容区域
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+            
+            // 初始显示第一个部分
+            document.querySelector('.tab.active').click();
+        });
+    </script>
+</body>
+</html>
